@@ -1,4 +1,4 @@
-/**
+/*
  * Sample React Native App
  * https://github.com/facebook/react-native
  *
@@ -8,6 +8,8 @@
 import React from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  Button,
+  Platform,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -24,6 +26,32 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import * as Sentry from '@sentry/react-native';
+
+const isMobileOs = Platform.OS === 'android' || Platform.OS === 'ios';
+
+const reactNavigationInstrumentation =
+  new Sentry.ReactNavigationInstrumentation({
+    routeChangeTimeoutMs: 500, // How long it will wait for the route change to complete. Default is 1000ms
+    enableTimeToInitialDisplay: isMobileOs,
+  });
+
+Sentry.init({
+  dsn: 'https://1df17bd4e543fdb31351dee1768bb679@o447951.ingest.us.sentry.io/5428561',
+  tracesSampleRate: 1.0,
+  debug: true,
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      // The time to wait in ms until the transaction will be finished, For testing, default is 1000 ms
+      finalTimeoutMs: 10,
+      routingInstrumentation: reactNavigationInstrumentation,
+      enableUserInteractionTracing: true,
+      ignoreEmptyBackNavigationTransactions: true,
+    }),
+  ],
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // enableSpotlight: __DEV__,
+});
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -72,6 +100,12 @@ function App(): React.JSX.Element {
         contentInsetAdjustmentBehavior="automatic"
         style={backgroundStyle}>
         <Header />
+        <Button
+          title="Try!"
+          onPress={() => {
+            Sentry.captureException(new Error('First error'));
+          }}
+        />
         <View
           style={{
             backgroundColor: isDarkMode ? Colors.black : Colors.white,
