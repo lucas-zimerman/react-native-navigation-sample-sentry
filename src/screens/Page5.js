@@ -5,7 +5,6 @@ import * as Sentry from '@sentry/react-native';
 const Page5Screen = () => {
     return (
       <View style={styles.root}>
-      <Sentry.TimeToInitialDisplay record={true} />
       <Text>Page5</Text>
       </View>
     );
